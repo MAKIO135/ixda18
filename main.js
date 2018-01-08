@@ -1,4 +1,10 @@
-let w, h, camera, scene, renderer, uniforms, clock;
+let camera, scene, renderer, uniforms, clock;
+let w, h, svg = d3.select( '#front' )
+    .append( 'svg' );
+
+let anim = {
+    display: () => {}
+};
 
 function initBackground(){
     scene = new THREE.Scene();
@@ -31,42 +37,78 @@ function initBackground(){
     scene.add( mesh );
 
     renderer = new THREE.WebGLRenderer( { canvas: document.getElementById( 'background' ) } );
-    renderer.setSize( width, height );
     renderer.setPixelRatio( window.devicePixelRatio );
     renderer.setClearColor( 0xffffff, 0 );
-
-    uniforms.resolution.value.x = width;
-    uniforms.resolution.value.y = height;
 }
 
 function setup(){
     var p5Canvas = createCanvas( windowWidth, windowHeight );
     p5Canvas.parent( 'back' );
 
+    svg = d3.select( '#front' ).append( 'svg' );
     initBackground();
 
-    anim1.start();
+    windowResized();
+
+    resetAnim();
 }
 
 function draw(){
     uniforms.time.value = millis() / 1000;
-    uniforms.factor.value = constrain( 3 + sin( millis() / 10000 ) * 3.5, 0, 6 );
-    uniforms.factor.value = 1;
+    // uniforms.factor.value = constrain( 3 + sin( millis() / 10000 ) * 3.5, 0, 6 );
+    // uniforms.factor.value = 1;
     renderer.render( scene, camera );
 
     clear();
-    anim1.display();
-}
-
-function mousePressed(){
-    anim1.start();
+    anim.display();
 }
 
 function windowResized(){
     resizeCanvas( windowWidth, windowHeight );
+
     renderer.setSize( width, height );
     uniforms.resolution.value.x = width;
     uniforms.resolution.value.y = height;
+
+    w = width;
+    h = height;
+    svg.attr({
+        width: w,
+        height: h
+    });
+}
+
+function resetAnim(){
+    TweenMax.to( uniforms.factor, 10, {
+        value: 1.0,
+        ease: Power1.easeOut,
+        delay: 5,
+        onComplete: selectAnim
+    } );
+}
+
+function selectAnim(){
+    if( ~~random( 2 ) ){
+        TweenMax.to( uniforms.factor, 10, {
+            value: 0.0,
+            ease: SlowMo.ease.config( 0.7, 0.4, false ),
+            delay: 20,
+            onComplete: startP5Anim
+        } );
+    }
+    else{
+        TweenMax.to( uniforms.factor, 10, {
+            value: 10.0,
+            ease: SlowMo.ease.config( 0.7, 0.4, false ),
+            delay: 20,
+            onComplete: animFront
+        } );
+    }
+}
+
+function startP5Anim(){
+    anim = anim1;
+    anim.start();
 }
 
 const anim1 = {
@@ -99,7 +141,8 @@ const anim1 = {
                 h: 0,
                 sw: 0,
                 delay: 1.5,
-                ease: Power2.easeIn
+                ease: Power2.easeIn,
+                onComplete: resetAnim
             } );
     },
 
