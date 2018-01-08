@@ -93,7 +93,7 @@ function selectAnim(){
             value: 0.0,
             ease: SlowMo.ease.config( 0.7, 0.4, false ),
             delay: 20,
-            onComplete: startP5Anim
+            onComplete: startAnim
         } );
     }
     else{
@@ -101,14 +101,25 @@ function selectAnim(){
             value: 10.0,
             ease: SlowMo.ease.config( 0.7, 0.4, false ),
             delay: 20,
-            onComplete: animFront
+            onComplete: startAnim
         } );
     }
 }
 
-function startP5Anim(){
-    anim = anim1;
-    anim.start();
+function startAnim(){
+    switch( ~~random( 2 ) ){
+        case 0 :
+            animFront();
+            break;
+        case 1 :
+            anim = anim1;
+            anim.start();
+            break;
+        case 2 :
+            anim = anim1;
+            anim.start();
+            break;
+    }
 }
 
 const anim1 = {
@@ -152,13 +163,29 @@ const anim1 = {
         translate( width / 2, height / 2 );
         rotate( angle );
 
+        // drawingContext.shadowOffsetX = 10;
+        // drawingContext.shadowOffsetY = 10;
+        // drawingContext.shadowBlur = 20;
+        // drawingContext.shadowColor = 'rgba(0,0,0,0.8)';
+
         strokeWeight( this.sw );
         stroke( 255 );
-        fill( 255 );
-        // noFill();
+        // fill( 255 );
+        noFill();
         rectMode( CENTER );
         rect( 0, 0, this.w, this.h );
 
         pop();
+    }
+}
+
+const anim2 = {
+
+    start: () => {
+
+    },
+
+    display: () => {
+
     }
 }
