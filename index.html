@@ -37,50 +37,22 @@
             precision highp float;
             #endif
 
-            uniform float time;
-            uniform float factor;
             uniform vec2 resolution;
+            uniform float time;
+            uniform float patternSize;
+            uniform float noiseScale1;
+            uniform float noiseScale2;
 
             const vec3 color1 = vec3( 228., 0., 80. ) / 255.; // Electric Crimson
             const vec3 color2 = vec3( 66., 27., 75. ) / 255.; // Dark Purple
 
-            // utils
-            float random( vec2 uv ){
-                return fract( sin( dot( uv, vec2( 12.9898, 78.233 ) ) ) * 43758.5453 );
-            }
 
-            // 2D Noise based on Morgan McGuire @morgan3d
-            // https://www.shadertoy.com/view/4dS3Wd
-            float noise (vec2 st) {
-                vec2 i = floor(st);
-                vec2 f = fract(st);
-
-                // Four corners in 2D of a tile
-                float a = random(i);
-                float b = random(i + vec2(1.0, 0.0));
-                float c = random(i + vec2(0.0, 1.0));
-                float d = random(i + vec2(1.0, 1.0));
-
-                // Smooth Interpolation
-
-                // Cubic Hermine Curve.  Same as SmoothStep()
-                // vec2 u = f*f*(3.0-2.0*f);
-                // u = smoothstep(0.,1.,f);
-                // Quintic interpolation curve: Simplex Noise
-                vec2 u = f*f*f*(f*(f*6.-15.)+10.);
-
-                // Mix 4 coorners porcentages
-                return mix(a, b, u.x) +
-                        (c - a)* u.y * (1.0 - u.x) +
-                        (d - b) * u.x * u.y;
-            }
-
+            // Simplex noise 3D
+            // https://github.com/ashima/webgl-noise/wiki
             vec3 mod289(vec3 x) {
                 return x - floor(x * (1.0 / 289.0)) * 289.0;
             }
 
-            // Simplex noise 3D
-            // https://github.com/ashima/webgl-noise/wiki
             vec4 mod289(vec4 x) {
                 return x - floor(x * (1.0 / 289.0)) * 289.0;
             }
@@ -198,17 +170,16 @@
 
             void main(){
                 const float PI = 3.1415926;
-                float patternSize = 40.;
                 vec2 repetitions = floor( resolution / patternSize ) + 1.0;
                 vec2 origin = ( gl_FragCoord.xy - ( resolution - patternSize * repetitions ) / 2.  ) / patternSize;
                 vec2 pos = fract( origin );
 
                 float color = 0.0;
-                float threshold = 1.0 * factor;
-                float minthreshold = 1.02 * factor;
+                float threshold = 1.0;
+                float minthreshold = threshold + .1;
                 color += fill( rectSDF(
-                    rotate( pos, snoise( vec3( time / 63.345, floor( origin ) / 67.254 ) ) * 4.0 * PI - 2.0 ),
-                    vec2( minthreshold + threshold * snoise( vec3( time / 13.7, floor( origin ) / 25.012 ) ) , 3.0 )
+                    rotate( pos, snoise( vec3( time / noiseScale1, floor( origin ) / noiseScale1 ) ) * 4.0 * PI - 2.0 ),
+                    vec2( minthreshold + threshold * snoise( vec3( time / noiseScale2, floor( origin ) / noiseScale2 ) ) , 5.0 )
                 ), 0.5 );
 
                 gl_FragColor = vec4( mix( color2, color1, color ), 1. );
@@ -225,7 +196,7 @@
         <script src="lib/TweenMax.min.js" charset="utf-8"></script>
         <script src="lib/d3.v3.min.js"></script>
         <script src="lib/textures.min.js"></script>
-        <script src="main.js" charset="utf-8"></script>
         <script src="front.js" charset="utf-8"></script>
+        <script src="main.js" charset="utf-8"></script>
     </body>
 </html>
