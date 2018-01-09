@@ -199,7 +199,7 @@
             void main(){
                 const float PI = 3.1415926;
                 float patternSize = 40.;
-                vec2 repetitions = resolution / patternSize;
+                vec2 repetitions = floor( resolution / patternSize ) + 1.0;
                 vec2 origin = ( gl_FragCoord.xy - ( resolution - patternSize * repetitions ) / 2.  ) / patternSize;
                 vec2 pos = fract( origin );
 
