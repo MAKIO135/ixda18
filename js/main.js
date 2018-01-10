@@ -1,7 +1,7 @@
 const color1 = '#e40050',
     color2 = '#421b4b';
 
-let camera, scene, renderer, uniforms, startTime = Math.random() * 150 * 1000;
+let camera, scene, renderer, uniforms, startTime = Math.random() * 1500;
 let w, h, svg;
 
 let imgs = [];
@@ -36,7 +36,7 @@ function setup(){
 }
 
 function draw(){
-    uniforms.time.value = ( millis() + startTime ) / 1000;
+    uniforms.time.value = millis() / 1000 + startTime;
     renderer.render( scene, camera );
 
     clear();
@@ -73,6 +73,7 @@ function displayBackground(){
     uniforms.patternSize.value = random( 10, 40 );
     uniforms.noiseScale1.value = random( 20, 100 );
     uniforms.noiseScale2.value = random( 30, 140 );
+    startTime = Math.random() * 1500;
 
     let axisX = ~~random( 2 );
     let axisY = ~~random( 2 );
