@@ -1,33 +1,34 @@
 // vertical stack bar graph
-function animD3_0() {
-    let margin, space, barWidth, rects, nb, g, data;
+const anim3 = {
+    start: () => {
+        let margin, space, barWidth, rects, nb, g, data;
 
-    (function() {
-        margin = 50;
-        space = 10;
-        barWidth = 30;
+        (function() {
+            margin = 50;
+            space = 10;
+            barWidth = 30;
 
-        nb = Math.floor((w - margin * 2) / (barWidth + space));
-        margin = (w - (nb * (barWidth + space))) / 2;
+            nb = Math.floor((w - margin * 2) / (barWidth + space));
+            margin = (w - (nb * (barWidth + space))) / 2;
 
-        g = svg.append('g')
+            g = svg.append('g')
             .attr('id', 'bars');
 
-        data = d3.range(nb).map(function(d) {
-            let pos = Math.random() < .5 ? -1 : 1,
+            data = d3.range(nb).map(function(d) {
+                let pos = Math.random() < .5 ? -1 : 1,
                 height = 20 + Math.random() * (h / 2 - 20 - 20),
                 h1 = 5 + Math.random() * (height / 2 - 10),
                 h2 = 5 + Math.random() * (height / 2 - 10),
                 h3 = height - h1 - h2;
 
-            return {
-                pos: pos,
-                height: height,
-                cumul: [h1, h2, h3]
-            };
-        });
+                return {
+                    pos: pos,
+                    height: height,
+                    cumul: [h1, h2, h3]
+                };
+            });
 
-        rects = g.selectAll('rect')
+            rects = g.selectAll('rect')
             .remove()
             .data(d3.range(nb * 3))
             .enter()
@@ -54,14 +55,14 @@ function animD3_0() {
                 };
             });
 
-        step1();
-    })();
+            step1();
+        })();
 
-    // small bars graph
-    function step1() {
-        let count = 0;
+        // small bars graph
+        function step1() {
+            let count = 0;
 
-        rects
+            rects
             .attr({
                 opacity: 1.0,
                 fill: 'rgb( 255, 255, 255 )',
@@ -88,13 +89,13 @@ function animD3_0() {
                 count++;
                 if (count === nb * 3) step2();
             });
-    }
+        }
 
-    // stack bars
-    function step2() {
-        let count = 0;
+        // stack bars
+        function step2() {
+            let count = 0;
 
-        rects
+            rects
             .transition()
             .attr('y', function(d, i) {
                 let y;
@@ -122,13 +123,13 @@ function animD3_0() {
                 count++;
                 if (count === nb * 3) step3();
             })
-    }
+        }
 
-    // large bars graph
-    function step3() {
-        let count = 0;
+        // large bars graph
+        function step3() {
+            let count = 0;
 
-        rects
+            rects
             .transition()
             .duration(300)
             .attr('height', function(d, i) {
@@ -158,19 +159,19 @@ function animD3_0() {
                 count++;
                 if (count === nb * 3) step4();
             });
-    }
+        }
 
-    function step4() {
-        let last = 0,
+        function step4() {
+            let last = 0,
             count = 0;
 
-        let sortedHeights = data.map(function(d) {
-            return d.height * d.pos;
-        }).sort(function(a, b) {
-            return -(a - b);
-        });
+            let sortedHeights = data.map(function(d) {
+                return d.height * d.pos;
+            }).sort(function(a, b) {
+                return -(a - b);
+            });
 
-        rects
+            rects
             .datum(function(d, i) {
                 let index = sortedHeights.indexOf(d.height * d.pos);
                 if (index == last) {
@@ -192,13 +193,13 @@ function animD3_0() {
                 count++;
                 if (count === data.length) step5();
             });
-    }
+        }
 
-    // disapperaing large bars
-    function step5() {
-        let count = 0;
+        // disapperaing large bars
+        function step5() {
+            let count = 0;
 
-        rects
+            rects
             .transition()
             .duration(300)
             .attr({
@@ -209,12 +210,15 @@ function animD3_0() {
                 count++;
                 if (count === nb * 3) endStep();
             });
-    }
+        }
 
-    function endStep() {
-        rects.remove();
-        g.remove();
+        function endStep() {
+            rects.remove();
+            g.remove();
 
-        pauseAfterAnim();
-    }
+            pauseAfterAnim();
+        }
+    },
+
+    display: () => {}
 }

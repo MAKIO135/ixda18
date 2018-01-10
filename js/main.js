@@ -181,33 +181,33 @@ function pauseAfterAnim(){
 
 function startAnim(){
     let choice = ~~ random( 8 );
-    console.log( choice );
-    switch( choice ){
+    // console.log( choice );
+    // switch( choice ){
+    switch( 0 ){
         case 0 :
-            animD3_0();
+            currentAnim = anim0;
             break;
         case 1 :
-            animD3_1();
+            currentAnim = anim1;
             break;
         case 2 :
-            animD3_2();
+            currentAnim = anim2;
             break;
         case 3 :
-            animD3_3();
+            currentAnim = anim3;
             break;
         case 4 :
-            animD3_4();
+            currentAnim = anim0;
             break;
         case 5 :
-            animD3_5();
+            currentAnim = anim0;
             break;
         case 6 :
-            currentAnim = anim1;
-            currentAnim.start();
+            currentAnim = anim0;
             break;
         case 7 :
-            currentAnim = anim2;
-            currentAnim.start();
+            currentAnim = anim0;
             break;
     }
+    currentAnim.start();
 }
