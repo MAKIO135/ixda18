@@ -3,200 +3,27 @@
     <head>
         <meta charset="utf-8">
         <title>ixda18</title>
-
-        <link href="https://fonts.googleapis.com/css?family=Raleway:900italic" rel="stylesheet" type="text/css">
-        <style>
-            *{
-                padding: 0; margin: 0;
-            }
-            body{
-                background-color: #000;
-                overflow: hidden;
-            }
-            canvas, svg{
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-            }
-            svg{
-                pointer-events: none;
-            }
-        </style>
-
-        <script id="vertexShader" type="x-shader/x-vertex">
-            void main() {
-                gl_Position = vec4( position, 1.0 );
-            }
-        </script>
-        </style>
-
-        <script id="backgroundFrag" type="x-shader/x-fragment">
-            #ifdef GL_ES
-            precision highp float;
-            #endif
-
-            uniform vec2 resolution;
-            uniform float time;
-            uniform float patternSize;
-            uniform float noiseScale1;
-            uniform float noiseScale2;
-
-            const vec3 color1 = vec3( 228., 0., 80. ) / 255.; // Electric Crimson
-            const vec3 color2 = vec3( 66., 27., 75. ) / 255.; // Dark Purple
-
-
-            // Simplex noise 3D
-            // https://github.com/ashima/webgl-noise/wiki
-            vec3 mod289(vec3 x) {
-                return x - floor(x * (1.0 / 289.0)) * 289.0;
-            }
-
-            vec4 mod289(vec4 x) {
-                return x - floor(x * (1.0 / 289.0)) * 289.0;
-            }
-
-            vec4 permute(vec4 x) {
-                return mod289(((x*34.0)+1.0)*x);
-            }
-
-            vec4 taylorInvSqrt(vec4 r){
-                return 1.79284291400159 - 0.85373472095314 * r;
-            }
-
-            float snoise(vec3 v){
-                const vec2  C = vec2(1.0/6.0, 1.0/3.0) ;
-                const vec4  D = vec4(0.0, 0.5, 1.0, 2.0);
-
-                // First corner
-                vec3 i  = floor(v + dot(v, C.yyy) );
-                vec3 x0 =   v - i + dot(i, C.xxx) ;
-
-                // Other corners
-                vec3 g = step(x0.yzx, x0.xyz);
-                vec3 l = 1.0 - g;
-                vec3 i1 = min( g.xyz, l.zxy );
-                vec3 i2 = max( g.xyz, l.zxy );
-
-                //   x0 = x0 - 0.0 + 0.0 * C.xxx;
-                //   x1 = x0 - i1  + 1.0 * C.xxx;
-                //   x2 = x0 - i2  + 2.0 * C.xxx;
-                //   x3 = x0 - 1.0 + 3.0 * C.xxx;
-                vec3 x1 = x0 - i1 + C.xxx;
-                vec3 x2 = x0 - i2 + C.yyy; // 2.0*C.x = 1/3 = C.y
-                vec3 x3 = x0 - D.yyy;      // -1.0+3.0*C.x = -0.5 = -D.y
-
-                // Permutations
-                i = mod289(i);
-                vec4 p = permute( permute( permute(
-                        i.z + vec4(0.0, i1.z, i2.z, 1.0 ) )
-                        + i.y + vec4(0.0, i1.y, i2.y, 1.0 ) )
-                        + i.x + vec4(0.0, i1.x, i2.x, 1.0 ) );
-
-                // Gradients: 7x7 points over a square, mapped onto an octahedron.
-                // The ring size 17*17 = 289 is close to a multiple of 49 (49*6 = 294)
-                float n_ = 0.142857142857; // 1.0/7.0
-                vec3  ns = n_ * D.wyz - D.xzx;
-
-                vec4 j = p - 49.0 * floor(p * ns.z * ns.z);  //  mod(p,7*7)
-
-                vec4 x_ = floor(j * ns.z);
-                vec4 y_ = floor(j - 7.0 * x_ );    // mod(j,N)
-
-                vec4 x = x_ *ns.x + ns.yyyy;
-                vec4 y = y_ *ns.x + ns.yyyy;
-                vec4 h = 1.0 - abs(x) - abs(y);
-
-                vec4 b0 = vec4( x.xy, y.xy );
-                vec4 b1 = vec4( x.zw, y.zw );
-
-                //vec4 s0 = vec4(lessThan(b0,0.0))*2.0 - 1.0;
-                //vec4 s1 = vec4(lessThan(b1,0.0))*2.0 - 1.0;
-                vec4 s0 = floor(b0)*2.0 + 1.0;
-                vec4 s1 = floor(b1)*2.0 + 1.0;
-                vec4 sh = -step(h, vec4(0.0));
-
-                vec4 a0 = b0.xzyw + s0.xzyw*sh.xxyy ;
-                vec4 a1 = b1.xzyw + s1.xzyw*sh.zzww ;
-
-                vec3 p0 = vec3(a0.xy,h.x);
-                vec3 p1 = vec3(a0.zw,h.y);
-                vec3 p2 = vec3(a1.xy,h.z);
-                vec3 p3 = vec3(a1.zw,h.w);
-
-                //Normalise gradients
-                vec4 norm = taylorInvSqrt(vec4(dot(p0,p0), dot(p1,p1), dot(p2, p2), dot(p3,p3)));
-                p0 *= norm.x;
-                p1 *= norm.y;
-                p2 *= norm.z;
-                p3 *= norm.w;
-
-                // Mix final noise value
-                vec4 m = max(0.6 - vec4(dot(x0,x0), dot(x1,x1), dot(x2,x2), dot(x3,x3)), 0.0);
-                m = m * m;
-                return 42.0 * dot( m*m, vec4( dot(p0,x0), dot(p1,x1), dot(p2,x2), dot(p3,x3) ) );
-            }
-
-
-            vec2 rotate(vec2 st, float a) {
-                st = mat2(cos(a),-sin(a),
-                          sin(a),cos(a))*(st-.5);
-                return st+.5;
-            }
-
-            // SDF
-            float aastep(float threshold, float value) {
-                return smoothstep( threshold - 0.03, threshold + 0.03, value );
-            }
-
-            float stroke(float x, float size, float w) {
-                float d = aastep(size, x+w*.5) - aastep(size, x-w*.5);
-                return clamp(d, 0., 1.);
-            }
-
-            float fill(float x, float size) {
-                return 1.-aastep(size, x);
-            }
-
-            float circleSDF(vec2 st) {
-                return length(st-.5)*2.;
-            }
-
-            float rectSDF(vec2 st, vec2 s) {
-                st = st*2.-1.;
-                return max( abs(st.x/s.x), abs(st.y/s.y) );
-            }
-
-            void main(){
-                const float PI = 3.1415926;
-                vec2 repetitions = floor( resolution / patternSize ) + 1.0;
-                vec2 origin = ( gl_FragCoord.xy - ( resolution - patternSize * repetitions ) / 2.  ) / patternSize;
-                vec2 pos = fract( origin );
-
-                float color = 0.0;
-                float threshold = 1.0;
-                float minthreshold = threshold + .1;
-                color += fill( rectSDF(
-                    rotate( pos, snoise( vec3( time / noiseScale1, floor( origin ) / noiseScale1 ) ) * 4.0 * PI - 2.0 ),
-                    vec2( minthreshold + threshold * snoise( vec3( time / noiseScale2, floor( origin ) / noiseScale2 ) ) , 5.0 )
-                ), 0.5 );
-
-                gl_FragColor = vec4( mix( color2, color1, color ), 1. );
-            }
-        </script>
+        <link rel="stylesheet" href="css/style.css">
     </head>
     <body>
         <canvas id="background"></canvas>
         <div id="back"></div>
         <div id="front"></div>
 
-        <script src="lib/three.min.js" charset="utf-8"></script>
-        <script src="lib/p5.min.js" charset="utf-8"></script>
-        <script src="lib/TweenMax.min.js" charset="utf-8"></script>
-        <script src="lib/d3.v3.min.js"></script>
-        <script src="lib/textures.min.js"></script>
-        <script src="front.js" charset="utf-8"></script>
-        <script src="main.js" charset="utf-8"></script>
+        <script src="js/lib/three.min.js" charset="utf-8"></script>
+        <script src="js/lib/p5.min.js" charset="utf-8"></script>
+        <script src="js/lib/TweenMax.min.js" charset="utf-8"></script>
+        <script src="js/lib/d3.v3.min.js"></script>
+        <script src="js/lib/textures.min.js"></script>
+        <script src="js/background.js" charset="utf-8"></script>
+        <script src="js/anim1.js" charset="utf-8"></script>
+        <script src="js/anim2.js" charset="utf-8"></script>
+        <script src="js/anim3.js" charset="utf-8"></script>
+        <script src="js/anim4.js" charset="utf-8"></script>
+        <script src="js/anim5.js" charset="utf-8"></script>
+        <script src="js/anim6.js" charset="utf-8"></script>
+        <script src="js/anim7.js" charset="utf-8"></script>
+        <script src="js/anim8.js" charset="utf-8"></script>
+        <script src="js/main.js" charset="utf-8"></script>
     </body>
 </html>
