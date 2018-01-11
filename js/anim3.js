@@ -1,6 +1,6 @@
 // vertical stack bar graph
-const anim3 = {
-    start: () => {
+class Anim3{
+    start(){
         let margin, space, barWidth, rects, nb, g, data;
 
         (function() {
@@ -65,7 +65,7 @@ const anim3 = {
             rects
             .attr({
                 opacity: 1.0,
-                fill: 'rgb( 255, 255, 255 )',
+                fill: random( 1 ) < 0.5 ? frontColor : 'rgb( 255, 255, 255 )',
                 y: h / 2,
                 width: 8,
                 height: 0
@@ -218,7 +218,7 @@ const anim3 = {
 
             pauseAfterAnim();
         }
-    },
+    }
 
-    display: () => {}
+    display(){}
 }

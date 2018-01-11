@@ -1,5 +1,6 @@
-function animD3_5(){
-    var arc = d3.svg.arc();
+class Anim8{
+    start(){
+        var arc = d3.svg.arc();
 
         function arcTween( transition ) {
             transition.attrTween( 'd', function( d ) {
@@ -20,22 +21,22 @@ function animD3_5(){
             n = 5 + ~~( Math.random() * 5 );
             nb = 5 + ~~( Math.random() * 50 );
             paths = svg.selectAll( 'path' )
-                .remove()
-                .data( d3.range( nb ).map( function(){
-                    var inRad = 50 + Math.random() * 500;
+            .remove()
+            .data( d3.range( nb ).map( function(){
+                var inRad = 50 + Math.random() * 500;
 
-                    return {
-                        startAngle: 0,
-                        endAngle: 0,
-                        innerRadius: inRad,
-                        outerRadius: inRad + Math.random() * 60
-                    };
-                } ) )
-                .enter()
-                .append( 'path' )
-                .attr( 'd', arc )
-                .attr( 'fill', 'rgba( 255, 255, 255, 0.8 )' )
-                .attr( 'transform', 'translate(' + ( w / 2 ) + ',' + ( h / 2 ) + ')' );
+                return {
+                    startAngle: 0,
+                    endAngle: 0,
+                    innerRadius: inRad,
+                    outerRadius: inRad + Math.random() * 60
+                };
+            } ) )
+            .enter()
+            .append( 'path' )
+            .attr( 'd', arc )
+            .attr( 'fill', d => random( 1 ) < 0.5 ? frontColor :'rgba( 255, 255, 255, 0.8 )' )
+            .attr( 'transform', 'translate(' + ( w / 2 ) + ',' + ( h / 2 ) + ')' );
 
             anim();
         }
@@ -43,23 +44,23 @@ function animD3_5(){
         function anim(){
             var count = 0;
             paths
-                .transition()
-                .duration( 1000 )
-                .call( arcTween )
-                .transition()
-                .duration( 300 )
-                .each( 'end', function( d ){
-                    count ++;
-                    if( count === nb ){
-                        n --;
-                        if( n === 0){
-                            terminate();
-                        }
-                        else{
-                            anim();
-                        }
+            .transition()
+            .duration( 1000 )
+            .call( arcTween )
+            .transition()
+            .duration( 300 )
+            .each( 'end', function( d ){
+                count ++;
+                if( count === nb ){
+                    n --;
+                    if( n === 0){
+                        terminate();
                     }
-                } );
+                    else{
+                        anim();
+                    }
+                }
+            } );
         }
 
         init();
@@ -79,13 +80,16 @@ function animD3_5(){
         function terminate(){
             var count = 0;
             paths
-                .transition()
-                .duration( 1000 )
-                .call( arcTerminate )
-                .remove()
-                .each( 'end', function( d ){
-                    count ++;
-                    if( count === nb ) pauseAfterAnim();
-                } );
+            .transition()
+            .duration( 1000 )
+            .call( arcTerminate )
+            .remove()
+            .each( 'end', function( d ){
+                count ++;
+                if( count === nb ) pauseAfterAnim();
+            } );
         }
+    }
+
+    display(){}
 }

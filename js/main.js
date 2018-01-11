@@ -1,6 +1,12 @@
 const color1 = '#e40050',
     color2 = '#421b4b';
 
+let bgColor = color1,
+    frontColor = color2;
+
+const timeBetweenAnims = 10;
+const timeBeforeAfterAnims = 1;
+
 let camera, scene, renderer, uniforms, startTime = Math.random() * 1500;
 let w, h, svg;
 
@@ -10,9 +16,7 @@ function preload(){
     imgs.push( loadImage( 'imgs/2.png' ) );
 }
 
-
 let bgRect = {
-    color : color1,
     x : 0,
     y : 0,
     w : window.innerWidth,
@@ -43,8 +47,9 @@ function draw(){
 
     push();
     noStroke();
-    fill( bgRect.color );
+    fill( bgColor );
     rect( bgRect.x, bgRect.y, bgRect.w, bgRect.h );
+    rect( width - bgRect.x - bgRect.w, height - bgRect.y - bgRect.h, bgRect.w, bgRect.h );
     pop();
 
     currentAnim.display();
@@ -109,32 +114,40 @@ function displayBackground(){
 }
 
 function pauseBetweenAnims(){
-    TweenMax.to( bgRect, 30, { onComplete: transitionToAnim } );
+    TweenMax.to( bgRect, timeBetweenAnims, { onComplete: transitionToAnim } );
 }
 
 function transitionToAnim(){
+    [ bgColor, frontColor ] = [ color1, color2 ].shuffle();
     bgRect.x = 0;
     bgRect.y = 0;
     bgRect.w = 0;
     bgRect.h = 0;
 
-    let axisX = ~~random( 2 );
-    let axisY = ~~random( 2 );
+    // let axisX = ~~random( 2 );
+    let axisX = 0;
+    // let axisY = ~~random( 2 );
+    let axisY = 0;
+
+    let tl = new TimelineMax();
 
     if( axisX == 0 && axisY == 0 ){
-        TweenMax.fromTo( bgRect, 2, {
-            color: random( 1 ) < 0.5 ? color1 : color2,
+        tl.set( bgRect, {
+            y: height / 2,
             h: height
-        },
-        {
-            w: width,
+        } )
+        .to( bgRect, 0.5, {
+            w: width / 2,
+            ease: Bounce.easeOut
+        } )
+        .to( bgRect, 1, {
+            y: 0,
             ease: Power4.easeInOut,
             onComplete: pauseBeforeAnim
         } );
     }
     else if( axisX == 1 && axisY == 0 ){
         TweenMax.fromTo( bgRect, 2, {
-            color: random( 1 ) < 0.5 ? color1 : color2,
             x: width,
             w: width,
             h: height
@@ -147,7 +160,6 @@ function transitionToAnim(){
     }
     else if( axisX == 0 && axisY == 1 ){
         TweenMax.fromTo( bgRect, 2, {
-            color: random( 1 ) < 0.5 ? color1 : color2,
             w: width
         },
         {
@@ -158,7 +170,6 @@ function transitionToAnim(){
     }
     else if( axisX == 1 && axisY == 1 ){
         TweenMax.fromTo( bgRect, 2, {
-            color: random( 1 ) < 0.5 ? color1 : color2,
             y: height,
             w: width,
             h: height
@@ -172,32 +183,34 @@ function transitionToAnim(){
 }
 
 function pauseBeforeAnim(){
-    TweenMax.to( bgRect, 2, { onComplete: startAnim } );
+    TweenMax.to( bgRect, timeBeforeAfterAnims, { onComplete: startAnim } );
 }
 
 function pauseAfterAnim(){
-    TweenMax.to( bgRect, 2, { onComplete: displayBackground } );
+    currentAnim.display = () => {};
+    TweenMax.to( bgRect, timeBeforeAfterAnims, { onComplete: displayBackground } );
 }
 
 function startAnim(){
-    let choice = ~~ random( 8 );
-    // console.log( choice );
-    // switch( choice ){
-    switch( 0 ){
+    // let choice = 4;
+    let choice = random( [ 0, 2, 3, 4, 8 ] );
+    // let choice = ~~ random( 8 );
+
+    switch( choice ){
         case 0 :
-            currentAnim = anim0;
+            currentAnim = new Anim0();
             break;
         case 1 :
             currentAnim = anim1;
             break;
         case 2 :
-            currentAnim = anim2;
+            currentAnim = new Anim2();
             break;
         case 3 :
-            currentAnim = anim3;
+            currentAnim = new Anim3();
             break;
         case 4 :
-            currentAnim = anim0;
+            currentAnim = new Anim4();
             break;
         case 5 :
             currentAnim = anim0;
@@ -207,6 +220,9 @@ function startAnim(){
             break;
         case 7 :
             currentAnim = anim0;
+            break;
+        case 8 :
+            currentAnim = new Anim8();
             break;
     }
     currentAnim.start();
