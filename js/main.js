@@ -76,7 +76,7 @@ function displayBackground(){
     bgRect.w = width;
     bgRect.h = height;
     uniforms.patternSize.value = random( 10, 40 );
-    uniforms.noiseScale1.value = random( 20, 100 );
+    uniforms.noiseScale1.value = random( 40, 100 );
     uniforms.noiseScale2.value = random( 30, 140 );
     startTime = Math.random() * 1500;
 
@@ -193,15 +193,15 @@ function pauseAfterAnim(){
 
 function startAnim(){
     // let choice = 4;
-    let choice = random( [ 0, 2, 3, 4, 8 ] );
-    // let choice = ~~ random( 8 );
+    // let choice = random( [ 0, 2, 3, 4, 8 ] );
+    let choice = ~~ random( 9 );
 
     switch( choice ){
         case 0 :
             currentAnim = new Anim0();
             break;
         case 1 :
-            currentAnim = anim1;
+            currentAnim = new Anim1();
             break;
         case 2 :
             currentAnim = new Anim2();
@@ -213,13 +213,13 @@ function startAnim(){
             currentAnim = new Anim4();
             break;
         case 5 :
-            currentAnim = anim0;
+            currentAnim = new Anim5();
             break;
         case 6 :
-            currentAnim = anim0;
+            currentAnim = new Anim6();
             break;
         case 7 :
-            currentAnim = anim0;
+            currentAnim = new Anim7();
             break;
         case 8 :
             currentAnim = new Anim8();

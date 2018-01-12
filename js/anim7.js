@@ -1,30 +1,31 @@
 // radars
-function animD3_4() {
-    let angles, center, pts, pentas, lines, g, shapes;
+class Anim7 {
+    start(){
+        let angles, center, pts, pentas, lines, g, shapes;
 
-    (function() {
-        angles = d3.range(5).map(function(d) {
-            return {
-                sin: Math.sin((2 * Math.PI) / 5 * d - Math.PI / 2),
-                cos: Math.cos((2 * Math.PI) / 5 * d - Math.PI / 2)
-            };
-        });
-
-        center = {
-            x: w / 2,
-            y: h / 2 + 20
-        }
-
-        pts = d3.range(5).map(function(d) {
-            return angles.map(function(a) {
+        (function() {
+            angles = d3.range(5).map(function(d) {
                 return {
-                    x: ~~(center.x + a.cos * (d + 1) * 100),
-                    y: ~~(center.y + a.sin * (d + 1) * 100)
+                    sin: Math.sin((2 * Math.PI) / 5 * d - Math.PI / 2),
+                    cos: Math.cos((2 * Math.PI) / 5 * d - Math.PI / 2)
                 };
             });
-        });
 
-        pentas = svg.selectAll('path')
+            center = {
+                x: w / 2,
+                y: h / 2 + 20
+            }
+
+            pts = d3.range(5).map(function(d) {
+                return angles.map(function(a) {
+                    return {
+                        x: ~~(center.x + a.cos * (d + 1) * 100),
+                        y: ~~(center.y + a.sin * (d + 1) * 100)
+                    };
+                });
+            });
+
+            pentas = svg.selectAll('path')
             .data(pts)
             .enter()
             .append('path')
@@ -49,13 +50,13 @@ function animD3_4() {
                 return '0 ' + d.length;
             });
 
-        step1();
-    })();
+            step1();
+        })();
 
-    function step1() {
-        let count = 0;
+        function step1() {
+            let count = 0;
 
-        pentas
+            pentas
             .transition()
             .delay(function(d, i) {
                 return (pts.length - i) * 150;
@@ -68,12 +69,12 @@ function animD3_4() {
                 count++;
                 if (count == pts.length) step2();
             });
-    }
+        }
 
-    function step2() {
-        let count = 0;
+        function step2() {
+            let count = 0;
 
-        lines = svg.selectAll('line')
+            lines = svg.selectAll('line')
             .data(d3.range(5))
             .enter()
             .append('line')
@@ -97,12 +98,12 @@ function animD3_4() {
                 count++;
                 if (count == pts.length) step3();
             });
-    }
+        }
 
-    function step3() {
-        let count = 0;
-        g = svg.append('g');
-        shapes = g.selectAll('path')
+        function step3() {
+            let count = 0;
+            g = svg.append('g');
+            shapes = g.selectAll('path')
             .data(d3.range(4))
             .enter()
             .append('path')
@@ -113,9 +114,9 @@ function animD3_4() {
                 }).join(' ') + ' Z'
             });
 
-        (function animShapes() {
-            let n = 0;
-            shapes
+            (function animShapes() {
+                let n = 0;
+                shapes
                 .transition()
                 .duration(300)
                 .delay(function(d) {
@@ -135,18 +136,18 @@ function animD3_4() {
                         else animShapes();
                     }
                 });
-        })();
-    }
+            })();
+        }
 
-    function step4() {
-        d3.selectAll('line')
+        function step4() {
+            d3.selectAll('line')
             .transition()
             .duration(300)
             .attr('x2', center.x)
             .attr('y2', center.y);
 
-        let count = 0;
-        pentas
+            let count = 0;
+            pentas
             .data(pts)
             .attr('d', function(d) {
                 return d.reverse().map(function(pt, i) {
@@ -174,19 +175,22 @@ function animD3_4() {
                 if (count === pts.length) endStep();
             });
 
-        shapes
+            shapes
             .transition()
             .duration(300)
             .attr('d', d3.range(5).map(function(i) {
                 return (i === 0 ? 'M ' : 'L ') + center.x + ' ' + center.y;
             }).join(' ') + ' Z')
+        }
+
+        function endStep() {
+            pentas.remove();
+            d3.selectAll('line').remove();
+            g.remove();
+
+            pauseAfterAnim();
+        }
     }
 
-    function endStep() {
-        pentas.remove();
-        d3.selectAll('line').remove();
-        g.remove();
-
-        pauseAfterAnim();
-    }
+    display(){}
 }

@@ -1,10 +1,12 @@
-const anim1 = {
-    w: 0,
-    h: 0,
-    sw: 0,
-    angle: 0,
+class Anim1 {
+    constructor(){
+        this.w = 0;
+        this.h = 0;
+        this.sw = 0;
+        this.angle = 0;
+    }
 
-    start: () => {
+    start(){
         let tl = new TimelineMax();
         tl.set( this, {
                 w: 0,
@@ -31,9 +33,9 @@ const anim1 = {
                 ease: Power2.easeIn,
                 onComplete: pauseAfterAnim
             } );
-    },
+    }
 
-    display: () => {
+    display(){
         push();
 
         translate( width / 2, height / 2 );

@@ -24,14 +24,13 @@ class Anim0 {
                 tl.set( this, {
                     w: 0,
                     h: 0,
-                    sw: 0,
-                    ease: Bounce.easeOut
+                    sw: 0
                 } )
                 .to( this, 0.8, {
                     w: targetS - 5,
                     h: targetS - 5,
                     sw: 0.5,
-                    ease: Bounce.easeOut
+                    ease: Power4.easeOut
                 } )
                 .to( this, 0.8, {
                     h: 0,
@@ -72,8 +71,6 @@ class Anim0 {
         }
 
         this.rects.forEach( r => r.anim() );
-
-        console.log( 'started', this.rects.length );
     }
 
     display(){
