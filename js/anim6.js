@@ -2,10 +2,11 @@
 class Anim6{
     start(){
         let data, mask, rectmasks, g, arcs;
+        let rnd = Math.random();
 
         let arc = d3.svg.arc()
-        .innerRadius(0)
-        .outerRadius(w);
+            .innerRadius(0)
+            .outerRadius(w);
 
         function arcTween(transition) {
             transition.attrTween('d', function(d) {
@@ -19,20 +20,20 @@ class Anim6{
 
         (function() {
             mask = svg.append('clipPath')
-            .attr('id', 'mask');
+                .attr('id', 'mask');
 
             rectmasks = mask.selectAll('rect')
-            .data(d3.range(20))
-            .enter()
-            .append('rect')
-            .attr({
-                y: 0,
-                width: w / 20 + 2,
-                height: h
-            })
-            .attr('x', function(d, i) {
-                return i * (w / 20);
-            });
+                .data(d3.range(20))
+                .enter()
+                .append('rect')
+                .attr({
+                    y: 0,
+                    width: w / 20 + 2,
+                    height: h
+                })
+                .attr('x', function(d, i) {
+                    return i * (w / 20);
+                });
 
             data = [];
             for (let a = 0; a < 2 * Math.PI;) {
@@ -57,10 +58,10 @@ class Anim6{
 
             let patterns = data.map(function(d, i) {
                 let t = textures.lines()
-                .stroke('rgb( 255, 255, 255 )')
-                .thinner(patternScale(d.diff))
-                .orientation('' + ~~(1 + Math.random() * 7) + '/8')
-                .id('pattern' + i);
+                    .stroke(rnd < .5 ? frontColor : 'rgb( 255, 255, 255 )')
+                    .thinner(patternScale(d.diff))
+                    .orientation('' + ~~(1 + Math.random() * 7) + '/8')
+                    .id('pattern' + i);
 
                 svg.call(t);
 
@@ -92,28 +93,28 @@ class Anim6{
             .range([0, 500]);
 
             arcs
-            .transition()
-            .ease('linear')
-            .delay(function(d) {
-                return timeScale(d.startAngle);
-            })
-            .duration(100)
-            .transition()
-            .duration(function(d) {
-                return timeScale(d.diff);
-            })
-            .call(arcTween)
-            .each('start', function() {
-                d3.select(this)
-                .attr('stroke', 'rgb( 255, 255, 255 )')
-                .attr('stroke-width', 3);
-            })
-            .transition()
-            .duration(500)
-            .each('end', function() {
-                count++;
-                if (count === data.length) step2();
-            })
+                .transition()
+                .ease('linear')
+                .delay(function(d) {
+                    return timeScale(d.startAngle);
+                })
+                .duration(100)
+                .transition()
+                .duration(function(d) {
+                    return timeScale(d.diff);
+                })
+                .call(arcTween)
+                .each('start', function() {
+                    d3.select(this)
+                    .attr('stroke', rnd < .5 ? frontColor : 'rgb( 255, 255, 255 )')
+                    .attr('stroke-width', 3);
+                })
+                .transition()
+                .duration(500)
+                .each('end', function() {
+                    count++;
+                    if (count === data.length) step2();
+                })
         }
 
         function step2() {

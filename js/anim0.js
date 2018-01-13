@@ -20,7 +20,7 @@ class Anim0 {
             anim(){
                 let tl = new TimelineMax();
                 let targetS = this.s;
-
+                let delay = random( 0.5, 1.2 );
                 tl.set( this, {
                     w: 0,
                     h: 0,
@@ -30,13 +30,14 @@ class Anim0 {
                     w: targetS - 5,
                     h: targetS - 5,
                     sw: 0.5,
-                    ease: Power4.easeOut
+                    delay: delay,
+                    ease: Bounce.easeOut
                 } )
                 .to( this, 0.8, {
                     h: 0,
                     sw: 0,
-                    delay: 1,
-                    ease: Bounce.easeOut
+                    delay: 1.5 + 1 - delay,
+                    ease: Power4.easeOut
                 } )
                 .to( this, 0.1, {
                     finished: true
@@ -58,7 +59,7 @@ class Anim0 {
         this.rects = [ new Rect( width / 2 - s / 2, height / 2 - s / 2, s, 5 ) ];
         this.rects[ 0 ].shouldSplit = true;
 
-        for( var n = 5; n > 0; n-- ){
+        for( var n = 7; n > 0; n-- ){
             this.rects.forEach( r => {
                 if( r.shouldSplit ){
                     r.n --;

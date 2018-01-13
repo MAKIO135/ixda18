@@ -11,6 +11,7 @@ function initBackground(){
 
         uniform vec2 resolution;
         uniform float time;
+        uniform int mode;
         uniform float patternSize;
         uniform float noiseScale1;
         uniform float noiseScale2;
@@ -119,7 +120,7 @@ function initBackground(){
 
         // SDF
         float aastep(float threshold, float value) {
-            return smoothstep( threshold - 0.03, threshold + 0.03, value );
+            return smoothstep( threshold - 0.08, threshold + 0.08  , value );
         }
 
         float stroke(float x, float size, float w) {
@@ -149,10 +150,16 @@ function initBackground(){
             float color = 0.0;
             float threshold = 1.0;
             float minthreshold = threshold + .1;
-            color += fill( rectSDF(
-                rotate( pos, snoise( vec3( time / noiseScale1, floor( origin ) / noiseScale1 ) ) * 4.0 * PI - 2.0 ),
-                vec2( minthreshold + threshold * snoise( vec3( time / noiseScale2, floor( origin ) / noiseScale2 ) ) , 5.0 )
-            ), 0.5 );
+            if( mode == 0 ){
+                color += fill( rectSDF(
+                    rotate( pos, snoise( vec3( time / noiseScale1, floor( origin ) / noiseScale1 ) ) * 4.0 * PI - 2.0 ),
+                    vec2( minthreshold + threshold * snoise( vec3( time / noiseScale2, floor( origin ) / noiseScale2 ) ) , 5.0 )
+                ), 0.5 );
+            }
+            else if( mode == 1 ){
+                color += fill( circleSDF( pos ), 5.0 + snoise( vec3( time / 3.0, floor( origin ) / noiseScale2 ) ) );
+                color -= fill( circleSDF( pos ), 0.8 + snoise( vec3( time / 3.0, floor( origin ) / noiseScale2 ) ) );
+            }
 
             gl_FragColor = vec4( mix( color2, color1, color ), 1. );
         }`;
@@ -170,6 +177,10 @@ function initBackground(){
         time : {
             type : 'f',
             value : 0.0
+        },
+        mode : {
+            type : 'i',
+            value : 0
         },
         patternSize : {
             type : 'f',

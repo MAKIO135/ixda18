@@ -46,7 +46,7 @@ function draw(){
     clear();
 
     push();
-    noStroke();
+    stroke( bgColor );
     fill( bgColor );
     rect( bgRect.x, bgRect.y, bgRect.w, bgRect.h );
     rect( width - bgRect.x - bgRect.w, height - bgRect.y - bgRect.h, bgRect.w, bgRect.h );
@@ -78,6 +78,7 @@ function displayBackground(){
     uniforms.patternSize.value = random( 10, 40 );
     uniforms.noiseScale1.value = random( 40, 100 );
     uniforms.noiseScale2.value = random( 30, 140 );
+    uniforms.mode.value = ~~random( 2 );
     startTime = Math.random() * 1500;
 
     let axisX = ~~random( 2 );
@@ -192,9 +193,9 @@ function pauseAfterAnim(){
 }
 
 function startAnim(){
-    // let choice = 4;
     // let choice = random( [ 0, 2, 3, 4, 8 ] );
     let choice = ~~ random( 9 );
+    // choice = 6;
 
     switch( choice ){
         case 0 :

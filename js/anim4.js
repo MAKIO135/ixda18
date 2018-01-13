@@ -103,7 +103,8 @@ class Anim4{
             .enter()
             .append('path')
             .attr('d', arc)
-            .attr('fill', 'rgba( 255, 255, 255, .3 )')
+            .attr('fill', random( 1 ) < 0.5 ? frontColor : 'rgb( 255, 255, 255 )')
+            .attr('opacity', .3)
             .attr('transform', function(d) {
                 return 'translate(' + (50 + d.x) + ',' + (h / 2) + ')';
             })
