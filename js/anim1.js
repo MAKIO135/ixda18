@@ -39,7 +39,7 @@ class Anim1 {
         push();
 
         translate( width / 2, height / 2 );
-        rotate( angle );
+        rotate( this.angle );
 
         // drawingContext.shadowOffsetX = 10;
         // drawingContext.shadowOffsetY = 10;
@@ -49,7 +49,6 @@ class Anim1 {
         strokeWeight( this.sw );
         stroke( 255 );
         fill( 255 );
-        noFill();
         rectMode( CENTER );
         rect( 0, 0, this.w, this.h );
 

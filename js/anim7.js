@@ -2,6 +2,7 @@
 class Anim7 {
     start(){
         let angles, center, pts, pentas, lines, g, shapes;
+        let rnd = Math.random();
 
         (function() {
             angles = d3.range(5).map(function(d) {
@@ -33,8 +34,9 @@ class Anim7 {
                 'stroke-width': 2,
                 fill: 'none'
             })
-            .attr('stroke', function(d, i) {
-                return 'rgba( 255, 255, 255, ' + (i === pts.length - 1 ? 1.0 : 0.5) + ' )'
+            .attr('stroke', rnd ? frontColor : 'rgb( 255, 255, 255 )' )
+            .attr('opacity', function(d, i) {
+                return (i === pts.length - 1 ? 1.0 : 0.5)
             })
             .attr('d', function(d) {
                 return d.map(function(pt, i) {
@@ -79,7 +81,8 @@ class Anim7 {
             .enter()
             .append('line')
             .attr({
-                stroke: 'rgba( 255, 255, 255, 0.5 )',
+                stroke: rnd ? frontColor : 'rgb( 255, 255, 255 )',
+                opacity: 0.5,
                 'stroke-width': 2,
                 x1: center.x,
                 y1: center.y,
@@ -108,7 +111,8 @@ class Anim7 {
             .enter()
             .append('path')
             .attr({
-                fill: 'rgba( 255, 255, 255, 0.5 )',
+                fill: Math.random() < .5 ? frontColor : 'rgb( 255, 255, 255 )',
+                opacity: 0.5,
                 d: d3.range(5).map(function(i) {
                     return (i === 0 ? 'M ' : 'L ') + center.x + ' ' + center.y;
                 }).join(' ') + ' Z'
