@@ -10,10 +10,9 @@ const timeBeforeAfterAnims = 1;
 let camera, scene, renderer, uniforms, startTime = Math.random() * 1500;
 let w, h, svg;
 
-let imgs = [];
+let logo;
 function preload(){
-    imgs.push( loadImage( 'imgs/1.png' ) );
-    imgs.push( loadImage( 'imgs/2.png' ) );
+    logo = loadImage( 'imgs/interaction18.png' );
 }
 
 let bgRect = {
@@ -31,6 +30,11 @@ function setup(){
     var p5Canvas = createCanvas( windowWidth, windowHeight );
     p5Canvas.parent( 'back' );
 
+    if( logo.width > width/2 ){
+        let scale = logo.width / (width/2);
+        logo.resize( width/2, logo.height / scale );
+    }
+
     svg = d3.select( '#front' ).append( 'svg' );
     initBackground();
 
@@ -46,6 +50,9 @@ function draw(){
     clear();
 
     push();
+    imageMode( CENTER );
+    image( logo, width/2, height/2 );
+
     stroke( bgColor );
     fill( bgColor );
     rect( bgRect.x, bgRect.y, bgRect.w, bgRect.h );
@@ -76,9 +83,11 @@ function displayBackground(){
     bgRect.w = width;
     bgRect.h = height;
     uniforms.patternSize.value = random( 10, 40 );
+// uniforms.patternSize.value = 150;
     uniforms.noiseScale1.value = random( 40, 100 );
     uniforms.noiseScale2.value = random( 30, 140 );
     uniforms.mode.value = ~~random( 2 );
+// uniforms.mode.value = 2;
     startTime = Math.random() * 1500;
 
     let axisX = ~~random( 2 );
@@ -193,9 +202,8 @@ function pauseAfterAnim(){
 }
 
 function startAnim(){
-    // let choice = random( [ 0, 2, 3, 4, 8 ] );
     let choice = ~~ random( 9 );
-    // choice = 6;
+    // choice = 5;
 
     switch( choice ){
         case 0 :

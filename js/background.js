@@ -20,6 +20,14 @@ function initBackground(){
         const vec3 color2 = vec3( 66., 27., 75. ) / 255.; // Dark Purple
 
 
+        float random( vec2 st ) {
+            return fract( sin( dot( st.xy, vec2( 12.9898, 78.233 ) ) ) * 43758.5453123 );
+        }
+
+        float round( float f ){
+            return f < 0.5 ? 0.0 : 1.0;
+        }
+
         // Simplex noise 3D
         // https://github.com/ashima/webgl-noise/wiki
         vec3 mod289(vec3 x) {
@@ -153,12 +161,22 @@ function initBackground(){
             if( mode == 0 ){
                 color += fill( rectSDF(
                     rotate( pos, snoise( vec3( time / noiseScale1, floor( origin ) / noiseScale1 ) ) * 4.0 * PI - 2.0 ),
-                    vec2( minthreshold + threshold * snoise( vec3( time / noiseScale2, floor( origin ) / noiseScale2 ) ) , 5.0 )
+                    vec2( minthreshold + threshold * snoise( vec3( time / 4.0, floor( origin ) / noiseScale2 ) ) , 5.0 )
                 ), 0.5 );
             }
             else if( mode == 1 ){
-                color += fill( circleSDF( pos ), 5.0 + snoise( vec3( time / 3.0, floor( origin ) / noiseScale2 ) ) );
-                color -= fill( circleSDF( pos ), 0.8 + snoise( vec3( time / 3.0, floor( origin ) / noiseScale2 ) ) );
+                color += stroke( circleSDF( pos ), 1.5, 1.5 + 2.5 * snoise( vec3( time / 4.0, floor( origin ) / noiseScale2 ) ) );
+            }
+            else if( mode == 2 ){
+                vec2 f = floor( origin );
+                if( snoise( vec3(time/100.0, f) ) < 0.0 ){
+                    color = fill( circleSDF( pos - 0.5 + vec2( round( random( vec2( random( f ) ) ) ) * 1.0 ) ), 2.0 );
+                }
+                else{
+                    color = 1.0;
+                    color -= fill( circleSDF( pos - 0.5 + vec2( round( random( vec2( random( f ) ) ) ) * 1.0 ) ), 2.0 );
+                }
+                // color = circleSDF( pos - 0.5 + vec2( round( random( vec2( random( f ) ) ) ) * 1.0 ) ) / 3.0;
             }
 
             gl_FragColor = vec4( mix( color2, color1, color ), 1. );
