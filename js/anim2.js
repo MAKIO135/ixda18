@@ -25,10 +25,10 @@ class Anim2{
 
             display(){
                 push();
-                drawingContext.shadowOffsetX = 10;
-                drawingContext.shadowOffsetY = 10;
-                drawingContext.shadowBlur = 20;
-                drawingContext.shadowColor = 'rgba(0,0,0,0.8)';
+                // drawingContext.shadowOffsetX = 10;
+                // drawingContext.shadowOffsetY = 10;
+                // drawingContext.shadowBlur = 20;
+                // drawingContext.shadowColor = 'rgba(0,0,0,0.8)';
                 stroke(this.c);
                 strokeCap(SQUARE);
                 strokeWeight(this.sw);

@@ -86,7 +86,7 @@ function displayBackground(){
 // uniforms.patternSize.value = 150;
     uniforms.noiseScale1.value = random( 40, 100 );
     uniforms.noiseScale2.value = random( 30, 140 );
-    uniforms.mode.value = ~~random( 2 );
+    uniforms.mode.value = ~~random( 4 );
 // uniforms.mode.value = 2;
     startTime = Math.random() * 1500;
 

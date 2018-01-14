@@ -1,4 +1,34 @@
 function initBackground(){
+    let test = `
+    #ifdef GL_ES
+    precision highp float;
+    #endif
+
+    uniform float time;
+    uniform vec2 resolution;
+
+    float wave(vec2 coord){
+        float interval = resolution.x * 0.04;
+        vec2 p = coord / interval;
+
+        float py2t = 0.112 * sin(time * 0.378);
+        float phase1 = dot(p, vec2(0.00, 1.00)) + time * 1.338;
+        float phase2 = dot(p, vec2(0.09, py2t)) + time * 0.566;
+        float phase3 = dot(p, vec2(0.08, 0.11)) + time * 0.666;
+
+        float pt = phase1 + sin(phase2) * 3.0;
+        pt = abs(fract(pt) - 0.5) * interval * 0.5;
+
+        float lw = 2.3 + sin(phase3) * 1.9;
+        return saturate(lw - pt);
+    }
+
+    void main(){
+        gl_FragColor.rgb = vec3(wave(gl_FragCoord.xy));
+    }
+
+    `
+
     let vertexShader = `
         void main() {
             gl_Position = vec4( position, 1.0 );
@@ -19,6 +49,9 @@ function initBackground(){
         const vec3 color1 = vec3( 228., 0., 80. ) / 255.; // Electric Crimson
         const vec3 color2 = vec3( 66., 27., 75. ) / 255.; // Dark Purple
 
+        float satur(float x) {
+            return clamp(x, 0., 1.);
+        }
 
         float random( vec2 st ) {
             return fract( sin( dot( st.xy, vec2( 12.9898, 78.233 ) ) ) * 43758.5453123 );
@@ -26,6 +59,22 @@ function initBackground(){
 
         float round( float f ){
             return f < 0.5 ? 0.0 : 1.0;
+        }
+
+        float wave(vec2 coord){
+            float interval = resolution.x * 0.04;
+            vec2 p = coord / interval;
+
+            float py2t = 0.112 * sin(time * 0.378);
+            float phase1 = dot(p, vec2(0.00, 1.00)) + time * 1.338;
+            float phase2 = dot(p, vec2(0.09, py2t)) + time * 0.566;
+            float phase3 = dot(p, vec2(0.08, 0.11)) + time * 0.666;
+
+            float pt = phase1 + sin(phase2) * 3.0;
+            pt = abs(fract(pt) - 0.5) * interval * 0.5;
+
+            float lw = 2.3 + sin(phase3) * 1.9;
+            return saturate(lw - pt);
         }
 
         // Simplex noise 3D
@@ -168,15 +217,31 @@ function initBackground(){
                 color += stroke( circleSDF( pos ), 1.5, 1.5 + 2.5 * snoise( vec3( time / 4.0, floor( origin ) / noiseScale2 ) ) );
             }
             else if( mode == 2 ){
-                vec2 f = floor( origin );
-                if( snoise( vec3(time/100.0, f) ) < 0.0 ){
-                    color = fill( circleSDF( pos - 0.5 + vec2( round( random( vec2( random( f ) ) ) ) * 1.0 ) ), 2.0 );
-                }
-                else{
-                    color = 1.0;
-                    color -= fill( circleSDF( pos - 0.5 + vec2( round( random( vec2( random( f ) ) ) ) * 1.0 ) ), 2.0 );
-                }
-                // color = circleSDF( pos - 0.5 + vec2( round( random( vec2( random( f ) ) ) ) * 1.0 ) ) / 3.0;
+                float scale = resolution.y / 10.;
+                vec2 p = gl_FragCoord.xy / scale;
+                vec2 p1 = fract(p) - 0.5;
+                vec2 p2 = fract(p - 0.5) - 0.5;
+
+                float z1 = random(0.12 * floor(p));
+                float z2 = random(0.23 * floor(p - 0.5));
+
+                float r1 = 0.2 + 0.2 * sin(time * 1.9 + z1 * 30.);
+                float r2 = 0.2 + 0.2 * sin(time * 1.9 + z2 * 30.);
+
+                float c1 = satur((r1 - length(p1)) * scale);
+                float c2 = satur((r2 - length(p2)) * scale);
+
+                float a1 = satur((r1 + 0.08 - length(p1)) * scale);
+                float a2 = satur((r2 + 0.08 - length(p2)) * scale);
+
+                color = mix(
+                    mix(mix(0., c1, a1), c2, a2),
+                    mix(mix(0., c2, a2), c1, a1),
+                    step(z1, z2)
+                );
+            }
+            else if( mode == 3 ){
+                color = wave( gl_FragCoord.xy );
             }
 
             gl_FragColor = vec4( mix( color2, color1, color ), 1. );
@@ -218,6 +283,7 @@ function initBackground(){
         uniforms : uniforms,
         vertexShader : vertexShader,
         fragmentShader : fragShader
+        // fragmentShader : test
     } );
 
     var mesh = new THREE.Mesh( geometry, material );
