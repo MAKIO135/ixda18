@@ -40,12 +40,6 @@ class Anim1 {
 
         translate( width / 2, height / 2 );
         rotate( this.angle );
-
-        // drawingContext.shadowOffsetX = 10;
-        // drawingContext.shadowOffsetY = 10;
-        // drawingContext.shadowBlur = 20;
-        // drawingContext.shadowColor = 'rgba(0,0,0,0.8)';
-
         strokeWeight( this.sw );
         stroke( 255 );
         fill( 255 );

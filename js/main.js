@@ -203,7 +203,7 @@ function pauseAfterAnim(){
 
 function startAnim(){
     let choice = ~~ random( 9 );
-    // choice = 5;
+    // choice = 2;
 
     switch( choice ){
         case 0 :
