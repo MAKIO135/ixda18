@@ -1,32 +1,157 @@
 function initBackground(){
     let test = `
-    #ifdef GL_ES
-    precision highp float;
-    #endif
+        #ifdef GL_ES
+        precision highp float;
+        #endif
 
-    uniform float time;
-    uniform vec2 resolution;
+        ///////////////////////////////////////////////
+        //
+        //          Begin Simplex Noise
+        //
+        ///////////////////////////////////////////////
 
-    float wave(vec2 coord){
-        float interval = resolution.x * 0.04;
-        vec2 p = coord / interval;
+        //
+        // Description : Array and textureless GLSL 2D/3D/4D simplex
+        //               noise functions.
+        //      Author : Ian McEwan, Ashima Arts.
+        //  Maintainer : ijm
+        //     Lastmod : 20110822 (ijm)
+        //     License : Copyright (C) 2011 Ashima Arts. All rights reserved.
+        //               Distributed under the MIT License. See LICENSE file.
+        //               https://github.com/ashima/webgl-noise
+        //
 
-        float py2t = 0.112 * sin(time * 0.378);
-        float phase1 = dot(p, vec2(0.00, 1.00)) + time * 1.338;
-        float phase2 = dot(p, vec2(0.09, py2t)) + time * 0.566;
-        float phase3 = dot(p, vec2(0.08, 0.11)) + time * 0.666;
+        vec3 mod289(vec3 x) {
+          return x - floor(x * (1.0 / 289.0)) * 289.0;
+        }
 
-        float pt = phase1 + sin(phase2) * 3.0;
-        pt = abs(fract(pt) - 0.5) * interval * 0.5;
+        vec4 mod289(vec4 x) {
+          return x - floor(x * (1.0 / 289.0)) * 289.0;
+        }
 
-        float lw = 2.3 + sin(phase3) * 1.9;
-        return saturate(lw - pt);
-    }
+        vec4 permute(vec4 x) {
+             return mod289(((x*34.0)+1.0)*x);
+        }
 
-    void main(){
-        gl_FragColor.rgb = vec3(wave(gl_FragCoord.xy));
-    }
+        vec4 taylorInvSqrt(vec4 r)
+        {
+          return 1.79284291400159 - 0.85373472095314 * r;
+        }
 
+        float snoise(vec3 v)
+          {
+          const vec2  C = vec2(1.0/6.0, 1.0/3.0) ;
+          const vec4  D = vec4(0.0, 0.5, 1.0, 2.0);
+
+        // First corner
+          vec3 i  = floor(v + dot(v, C.yyy) );
+          vec3 x0 =   v - i + dot(i, C.xxx) ;
+
+        // Other corners
+          vec3 g = step(x0.yzx, x0.xyz);
+          vec3 l = 1.0 - g;
+          vec3 i1 = min( g.xyz, l.zxy );
+          vec3 i2 = max( g.xyz, l.zxy );
+
+          //   x0 = x0 - 0.0 + 0.0 * C.xxx;
+          //   x1 = x0 - i1  + 1.0 * C.xxx;
+          //   x2 = x0 - i2  + 2.0 * C.xxx;
+          //   x3 = x0 - 1.0 + 3.0 * C.xxx;
+          vec3 x1 = x0 - i1 + C.xxx;
+          vec3 x2 = x0 - i2 + C.yyy; // 2.0*C.x = 1/3 = C.y
+          vec3 x3 = x0 - D.yyy;      // -1.0+3.0*C.x = -0.5 = -D.y
+
+        // Permutations
+          i = mod289(i);
+          vec4 p = permute( permute( permute(
+                     i.z + vec4(0.0, i1.z, i2.z, 1.0 ))
+                   + i.y + vec4(0.0, i1.y, i2.y, 1.0 ))
+                   + i.x + vec4(0.0, i1.x, i2.x, 1.0 ));
+
+        // Gradients: 7x7 points over a square, mapped onto an octahedron.
+        // The ring size 17*17 = 289 is close to a multiple of 49 (49*6 = 294)
+          float n_ = 0.142857142857; // 1.0/7.0
+          vec3  ns = n_ * D.wyz - D.xzx;
+
+          vec4 j = p - 49.0 * floor(p * ns.z * ns.z);  //  mod(p,7*7)
+
+          vec4 x_ = floor(j * ns.z);
+          vec4 y_ = floor(j - 7.0 * x_ );    // mod(j,N)
+
+          vec4 x = x_ *ns.x + ns.yyyy;
+          vec4 y = y_ *ns.x + ns.yyyy;
+          vec4 h = 1.0 - abs(x) - abs(y);
+
+          vec4 b0 = vec4( x.xy, y.xy );
+          vec4 b1 = vec4( x.zw, y.zw );
+
+          //vec4 s0 = vec4(lessThan(b0,0.0))*2.0 - 1.0;
+          //vec4 s1 = vec4(lessThan(b1,0.0))*2.0 - 1.0;
+          vec4 s0 = floor(b0)*2.0 + 1.0;
+          vec4 s1 = floor(b1)*2.0 + 1.0;
+          vec4 sh = -step(h, vec4(0.0));
+
+          vec4 a0 = b0.xzyw + s0.xzyw*sh.xxyy ;
+          vec4 a1 = b1.xzyw + s1.xzyw*sh.zzww ;
+
+          vec3 p0 = vec3(a0.xy,h.x);
+          vec3 p1 = vec3(a0.zw,h.y);
+          vec3 p2 = vec3(a1.xy,h.z);
+          vec3 p3 = vec3(a1.zw,h.w);
+
+        //Normalise gradients
+          vec4 norm = taylorInvSqrt(vec4(dot(p0,p0), dot(p1,p1), dot(p2, p2), dot(p3,p3)));
+          p0 *= norm.x;
+          p1 *= norm.y;
+          p2 *= norm.z;
+          p3 *= norm.w;
+
+        // Mix final noise value
+          vec4 m = max(0.6 - vec4(dot(x0,x0), dot(x1,x1), dot(x2,x2), dot(x3,x3)), 0.0);
+          m = m * m;
+          return 42.0 * dot( m*m, vec4( dot(p0,x0), dot(p1,x1),
+                                        dot(p2,x2), dot(p3,x3) ) );
+          }
+
+        ///////////////////////////////////////
+        //
+        //         End Simplex Noise
+        //
+        ///////////////////////////////////////
+
+        uniform float time;
+        uniform vec2 resolution;
+        const vec2 offset = vec2( 0.5, 0.3 );
+
+        float fbm(vec2 pos)
+        {
+        	float t = time / 20.0;
+        	float base = 0.75;
+        	float n = 0.0;// * snoise(vec3(base * pos.x, base * pos.y, t));
+        	n += 0.5 * (snoise(vec3(2.0 * base * pos.x, 2.0 * base * pos.y, 1.4*t)));
+        	n += 0.25 * (snoise(vec3(4.0 * base * pos.x, 4.0 * base * pos.y, 2.4*t)));
+            n += 0.125 * (snoise(vec3(8.0 * base * pos.x, 8.0 * base * pos.y, 3.4*t)));
+            n += 0.0625 * (snoise(vec3(16.0 * base * pos.x, 16.0 * base * pos.y, 4.4*t)));
+        	n += 0.03125 * (snoise(vec3(32.0 * base * pos.x, 32.0 * base * pos.y, 5.4*t)));
+        	n = (n + 1.0) / 2.0;
+        	return n * 0.7;
+        }
+
+        void main()
+        {
+        	vec2 p = gl_FragCoord.xy/resolution + offset;
+        	vec2 q = vec2(fbm(p), fbm(p));
+        	float n = fbm(p + 4.0*q);
+
+            const vec3 color1 = vec3( 228., 0., 80. ) / 255.; // Electric Crimson
+            const vec3 color2 = vec3( 66., 27., 75. ) / 255.; // Dark Purple
+
+        	vec3 pcolor = color1*4.0;
+        	vec3 qcolor = mix(color2, pcolor, q.x*q.y*4.0);
+
+        	vec3 color = qcolor * n;
+        	gl_FragColor = vec4(color, 1.0);
+        }
     `
 
     let vertexShader = `
@@ -217,7 +342,7 @@ function initBackground(){
                 color += stroke( circleSDF( pos ), 1.5, 1.5 + 2.5 * snoise( vec3( time / 4.0, floor( origin ) / noiseScale2 ) ) );
             }
             else if( mode == 2 ){
-                float scale = resolution.y / 10.;
+                float scale = resolution.y / 15.;
                 vec2 p = gl_FragCoord.xy / scale;
                 vec2 p1 = fract(p) - 0.5;
                 vec2 p2 = fract(p - 0.5) - 0.5;
@@ -225,8 +350,8 @@ function initBackground(){
                 float z1 = random(0.12 * floor(p));
                 float z2 = random(0.23 * floor(p - 0.5));
 
-                float r1 = 0.2 + 0.2 * sin(time * 1.9 + z1 * 30.);
-                float r2 = 0.2 + 0.2 * sin(time * 1.9 + z2 * 30.);
+                float r1 = 0.2 + 0.2 * sin(time * 0.9 + z1 * 30.);
+                float r2 = 0.2 + 0.2 * sin(time * 0.9 + z2 * 30.);
 
                 float c1 = satur((r1 - length(p1)) * scale);
                 float c2 = satur((r2 - length(p2)) * scale);
@@ -243,7 +368,37 @@ function initBackground(){
             else if( mode == 3 ){
                 color = wave( gl_FragCoord.xy );
             }
+            else if( mode == 4 ){
+                const float pi = 3.1415926535;
+                vec2 p = gl_FragCoord.xy - resolution / 2.;
+                float phi = atan(p.y, p.x + 1e-6);
 
+                float fin = mod(floor(phi * 3. / pi + 0.5), 6.);
+                float phi_fin = fin * pi / 3.;
+
+                vec2 dir = vec2(cos(phi_fin), sin(phi_fin));
+                float l = dot(dir, p) - time/20. * resolution.y / 5.;
+
+                float ivr = 20.;
+                float seg = l / ivr;
+
+                float w = sin(floor(seg) * 0.2 - time) * 0.4 + 0.5;
+                color = (w / 2. - abs(fract(seg) - 0.5)) * ivr;
+            }
+            else if( mode == 5 ){
+                color = 1.0 - gl_FragCoord.x / resolution.x;
+            }
+            else if( mode == 6 ){
+                color = gl_FragCoord.y / resolution.y;
+            }
+            else if( mode == 7 ){
+                color = 1.0 - gl_FragCoord.y / resolution.y;
+            }
+            else if( mode == 8 ){
+                color = gl_FragCoord.x / resolution.x;
+            }
+
+            color = clamp( color, 0.0, 1.0 );
             gl_FragColor = vec4( mix( color2, color1, color ), 1. );
         }`;
 

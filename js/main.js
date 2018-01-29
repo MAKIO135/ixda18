@@ -4,7 +4,8 @@ const color1 = '#e40050',
 let bgColor = color1,
     frontColor = color2;
 
-const timeBetweenAnims = 10;
+const timeBetweenAnims = 30;
+// const timeBetweenAnims = 1;
 const timeBeforeAfterAnims = 1;
 
 let camera, scene, renderer, uniforms, startTime = Math.random() * 1500;
@@ -51,7 +52,7 @@ function draw(){
 
     push();
     imageMode( CENTER );
-    image( logo, width/2, height/2 );
+    image( logo, width/2, height/2 - 20 );
 
     stroke( bgColor );
     fill( bgColor );
@@ -82,12 +83,13 @@ function displayBackground(){
     bgRect.y = 0;
     bgRect.w = width;
     bgRect.h = height;
+
     uniforms.patternSize.value = random( 10, 40 );
-// uniforms.patternSize.value = 150;
     uniforms.noiseScale1.value = random( 40, 100 );
     uniforms.noiseScale2.value = random( 30, 140 );
-    uniforms.mode.value = ~~random( 4 );
-// uniforms.mode.value = 2;
+    uniforms.mode.value = ~~random( 5 );
+    // uniforms.mode.value = 4;
+
     startTime = Math.random() * 1500;
 
     let axisX = ~~random( 2 );
@@ -202,8 +204,8 @@ function pauseAfterAnim(){
 }
 
 function startAnim(){
-    let choice = ~~ random( 9 );
-    // choice = 2;
+    let choice = ~~ random( 11 );
+// choice = 1;
 
     switch( choice ){
         case 0 :
@@ -232,6 +234,12 @@ function startAnim(){
             break;
         case 8 :
             currentAnim = new Anim8();
+            break;
+        case 9 :
+            currentAnim = new Anim9();
+            break;
+        case 10 :
+            currentAnim = new Anim10();
             break;
     }
     currentAnim.start();

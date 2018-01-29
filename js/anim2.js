@@ -1,10 +1,5 @@
 class Anim2{
     constructor(){
-        this.size = 40;
-        this.nx = Math.ceil(window.innerWidth / this.size);
-        this.margeX = (window.innerWidth - this.nx * this.size) / 2;
-        this.ny = Math.ceil(window.innerHeight / this.size);
-        this.margeY = (window.innerHeight - this.ny * this.size) / 2;
     }
 
     start(){
@@ -30,7 +25,7 @@ class Anim2{
                 drawingContext.shadowOffsetY = 5;
                 drawingContext.shadowBlur = 20;
                 drawingContext.shadowColor = 'rgba(0,0,0,0.8)';
-                
+
                 stroke(this.c);
                 strokeCap(SQUARE);
                 strokeWeight(this.sw);
