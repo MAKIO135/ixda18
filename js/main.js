@@ -52,7 +52,7 @@ function draw(){
 
     push();
     imageMode( CENTER );
-    image( logo, width/2, height/2 - 15 );
+    image( logo, width/2, height/2 - 20 );
 
     stroke( bgColor );
     fill( bgColor );

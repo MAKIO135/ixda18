@@ -59,7 +59,7 @@ class Anim0 {
         this.rects = [ new Rect( width / 2 - s / 2, height / 2 - s / 2, s, 5 ) ];
         this.rects[ 0 ].shouldSplit = true;
 
-        for( var n = 7; n > 0; n-- ){
+        for( var n = 5; n > 0; n-- ){
             this.rects.forEach( r => {
                 if( r.shouldSplit ){
                     r.n --;
