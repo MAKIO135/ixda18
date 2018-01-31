@@ -66,8 +66,8 @@ class Anim10{
         this.lines = new Array( ~~random( 35, 75 ) ).fill( 0 ).map( l => {
             let _nx = ~~ random( this.nx );
             let _ny = ~~ random( this.ny );
-            let x = this.margeX + ( _nx + 0.5 ) * this.size;
-            let y = this.margeY + ( _ny + 0.5 ) * this.size;
+            let x = this.margeX + _nx * this.size;
+            let y = this.margeY + _ny * this.size;
             let dx = _nx - this.delta < 0 ? x + this.delta * this.size :
                      _nx + this.delta > this.nx ? x - this.delta * this.size :
                      x + this.delta * this.size * ( random( 1 ) < .5 ? -1 : 1 );

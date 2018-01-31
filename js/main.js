@@ -205,7 +205,7 @@ function pauseAfterAnim(){
 
 function startAnim(){
     let choice = ~~ random( 11 );
-// choice = 1;
+// choice = 10;
 
     switch( choice ){
         case 0 :
