@@ -52,7 +52,7 @@ function draw(){
 
     push();
     imageMode( CENTER );
-    image( logo, width/2, height/2 - 20 );
+    image( logo, width/2, height/2 - 15 );
 
     stroke( bgColor );
     fill( bgColor );
@@ -136,10 +136,10 @@ function transitionToAnim(){
     bgRect.w = 0;
     bgRect.h = 0;
 
-    let axisX = ~~random( 2 );
-    // let axisX = 0;
-    let axisY = ~~random( 2 );
-    // let axisY = 0;
+    // let axisX = ~~random( 2 );
+    let axisX = 0;
+    // let axisY = ~~random( 2 );
+    let axisY = 0;
 
     let tl = new TimelineMax();
 
