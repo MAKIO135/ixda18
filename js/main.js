@@ -136,10 +136,10 @@ function transitionToAnim(){
     bgRect.w = 0;
     bgRect.h = 0;
 
-    // let axisX = ~~random( 2 );
-    let axisX = 0;
-    // let axisY = ~~random( 2 );
-    let axisY = 0;
+    let axisX = ~~random( 2 );
+    // let axisX = 0;
+    let axisY = ~~random( 2 );
+    // let axisY = 0;
 
     let tl = new TimelineMax();
 
