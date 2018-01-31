@@ -23,8 +23,17 @@ function initBackground(){
             return clamp(x, 0., 1.);
         }
 
+        float random( float x) {
+            return fract(sin(x)*1e4);
+        }
+
         float random( vec2 st ) {
             return fract( sin( dot( st.xy, vec2( 12.9898, 78.233 ) ) ) * 43758.5453123 );
+        }
+
+        float pattern(vec2 st, vec2 v, float t) {
+            vec2 p = floor(st+v);
+            return step(t, random(100.+ p *.000001)+random(p.x)*0.5 );
         }
 
         float round( float f ){
@@ -234,7 +243,7 @@ function initBackground(){
                 vec2 p = gl_FragCoord.xy / resolution;
                 for( int i = 1; i < 15; i++ ){
                     float r = random( vec2( float( i ) * 0.3456, floor( origin.y ) ) ) + 0.3;
-                    float px = ( sin( time * r / float( i ) ) / 2.0 + 0.5 ) * 2.0;
+                    float px = sin( time * r / float( i ) )* 2.0;
                     float rx = r / 18.0;
                     color += step( px - rx, p.x ) - step( px + rx, p.x );
                 }
@@ -252,6 +261,27 @@ function initBackground(){
                     color -= step( px - rx, p.x ) - step( px + rx, p.x );
                     color -= step( 1.0 - ( px + rx ), p.x ) - step( 1.0 - ( px - rx ), p.x );
                 }
+            }
+            else if( mode == 7 ){
+                vec2 st = gl_FragCoord.xy/resolution.xy;
+                st.x *= resolution.x/resolution.y;
+
+                vec2 grid = vec2(100.0,50.);
+                st *= grid;
+
+                vec2 ipos = floor(st);  // integer
+                vec2 fpos = fract(st);  // fraction
+
+                vec2 vel = vec2(time*2.*max(grid.x,grid.y)); // time
+                vel *= vec2(-1.,0.0) * random(1.0+ipos.y); // direction
+
+                // Assign a random value base on the integer coord
+                vec2 offset = vec2(0.1,0.);
+
+                color = pattern(st+offset,vel,0.5);
+
+                // Margins
+                color *= step(0.1,fpos.y);
             }
             // else if( mode == 5 ){
             //     color = 1.0 - gl_FragCoord.x / resolution.x;
