@@ -238,7 +238,7 @@ function initBackground(){
                     float rx = r / 18.0;
                     color += step( px - rx, p.x ) - step( px + rx, p.x );
                 }
-                color *= step( floor( origin.y ) * patternSize - patternSize/1.5, gl_FragCoord.y ) - step( floor( origin.y ) * patternSize + patternSize/1.5, gl_FragCoord.y );
+                color *= step( floor( origin.y ) * patternSize - patternSize*0.58, gl_FragCoord.y ) - step( floor( origin.y ) * patternSize + patternSize*0.58, gl_FragCoord.y );
             }
             else if( mode == 6 ){
                 vec2 p = gl_FragCoord.xy / resolution;
